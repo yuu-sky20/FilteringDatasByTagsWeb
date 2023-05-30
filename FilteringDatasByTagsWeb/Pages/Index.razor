@@ -1,0 +1,41 @@
+﻿@page "/"
+@using MatBlazor
+@inject IJSRuntime JSRuntime
+
+<h1>タグ付きのデータを整理するやつ</h1>
+<h5>Excelからタグ付きのデータをコピーしてきてね</h5>
+
+<EditForm Model="model">
+    <div class="row">
+        <div class="col">
+            <MatButton Outlined="true" OnClick="@this.OnClicked">変換</MatButton>
+            @if(@model.AfterData != null)
+            {
+                <MatButton Outlined="true" OnClick="@this.CopyTextToClipboard">クリップボードに送信</MatButton>
+            }
+        </div>
+        <div>
+            <label>変換前</label>
+            <MatTextField @bind-Value="@model.BeforeData" TextArea="true" FullWidth="true"></MatTextField>
+        </div>
+        <div>
+            <label>変換後</label>
+            <MatTextField Id="dst-text" @bind-Value="@model.AfterData" TextArea="true" ReadOnly="true" FullWidth="true"></MatTextField>
+        </div>
+    </div>
+</EditForm>
+
+@code {
+    private DataModel model = new DataModel();
+    private FilteringDatasByTags controller = new FilteringDatasByTags();
+
+    private void OnClicked()
+    {
+        model.AfterData = controller.Convert(model.BeforeData);
+    }
+
+    private async Task CopyTextToClipboard()
+    {
+        await JSRuntime.InvokeVoidAsync("copyClipboard");
+    }
+}
